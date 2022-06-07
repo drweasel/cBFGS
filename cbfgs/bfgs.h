@@ -8,6 +8,7 @@
 
 #include <stdbool.h>
 
+/** Computes the size of the required workspace, in bytes. */
 #define bfgs_WORKSPACE(n) (((n) * ((n) + 1) + 6 * (n)) * sizeof(double))
 
 /**
@@ -20,8 +21,7 @@
  * @param x parameter vector
  * @param n number of parameters
  * @param max_iter maximum number of iterations
- *
- * @author Michael Weitzel <mich@elweitzel.de>
+ * @param workspace pre-allocated memory (see bfgs_WORKSPACE)
  */
 bool
 bfgs(
