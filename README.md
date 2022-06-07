@@ -1,6 +1,6 @@
 # cBFGS
 
-A simplistic implementation of the Broyden–Fletcher–Goldfarb–Shanno algorithm
+A simplistic implementation of the *Broyden–Fletcher–Goldfarb–Shanno algorithm*
 (BFGS) for unconstraint nonlinear optimisation.
 
 
