@@ -6,7 +6,6 @@
  */
 #include <math.h>
 #include <stdbool.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define Lx(i, j) ((((i) * ((i) + 1)) >> 1) + (j))
@@ -244,20 +243,21 @@ bfgs(
   void* user_ptr,
   double* x,
   const unsigned int n,
-  const unsigned int max_iter)
+  const unsigned int max_iter,
+  void* workspace)
 {
     static const double eps = 2.2204e-16;
     const unsigned int ld = (n * (n + 1)) / 2;
-    double* B = (double*)malloc(ld * sizeof(double));
-    double* LD = (double*)malloc(ld * sizeof(double));
+    double* B = (double*)workspace;
+    double* LD = B + ld;
 
-    double* Dfx = (double*)malloc(n * sizeof(double));
-    double* s = (double*)malloc(n * sizeof(double));
-    double* y = (double*)malloc(n * sizeof(double));
+    double* Dfx = LD + ld;
+    double* s = Dfx + n;
+    double* y = s + n;
 
-    double* work = (double*)malloc(2 * n * sizeof(double));
-    double* Bs = work; // n values
-    double* p = (double*)malloc(n * sizeof(double));
+    double* work = y + n;
+    double* Bs = work;
+    double* p = work + 2 * n;
     double alpha;
     unsigned int iter;
     double step_length;
@@ -361,14 +361,6 @@ bfgs(
         /* Hessian not positive definite; probably not a proper minimum */
         result = false;
     }
-
-    free(p);
-    free(work);
-    free(y);
-    free(s);
-    free(Dfx);
-    free(LD);
-    free(B);
 
     return result;
 }

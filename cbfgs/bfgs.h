@@ -8,6 +8,8 @@
 
 #include <stdbool.h>
 
+#define bfgs_WORKSPACE(n) (((n) * ((n) + 1) + 6 * (n)) * sizeof(double))
+
 /**
  * Quasi-Newton optimizer implementing the BFGS algorithm for
  * unconstraint minization.
@@ -27,7 +29,8 @@ bfgs(
   void (*Df)(const double*, double*, void*),
   void* user_ptr,
   double* x,
-  const int n,
-  const int max_iter);
+  const unsigned int n,
+  const unsigned int max_iter,
+  void* workspace);
 
 // vim: fenc=utf-8 noet:

@@ -13,8 +13,10 @@
 bool
 test_rosenbrock()
 {
+	unsigned char workspace[bfgs_WORKSPACE(2)];
     double x[2] = { -14., 10. };
-    bool result = bfgs(rosenbrock_f, rosenbrock_Df, NULL, x, 2, 1000);
+    bool result =
+      bfgs(rosenbrock_f, rosenbrock_Df, NULL, x, 2, 1000, workspace);
     printf(
       "result=%s; x = [ %g, %g ]\n", result ? "true" : "false", x[0], x[1]);
 

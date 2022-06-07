@@ -174,8 +174,16 @@ decompose_RGB(RGB_Decomp* dcmp)
     for (int k = 0; k < dcmp->dim; ++k)
         dcmp->s[k] = 0.5;
 
-    result =
-      bfgs(rgb_decomp_obj_f, rgb_decomp_obj_Df, dcmp, dcmp->s, dcmp->dim, 1000);
+    void* workspace = malloc(bfgs_WORKSPACE(dcmp->dim));
+    result = bfgs(
+      rgb_decomp_obj_f,
+      rgb_decomp_obj_Df,
+      dcmp,
+      dcmp->s,
+      dcmp->dim,
+      1000,
+      workspace);
+    free(workspace);
 
     for (int k = 0; k < dcmp->dim; ++k)
     {
@@ -200,7 +208,10 @@ test_rgb2rgbw()
     RGB_Decomp dcmp = new_rgb_decomp(obj, base, 4);
 
     double x[4] = { 0.5, 0.5, 0.5, 0.5 };
-    bool result = bfgs(rgb_decomp_obj_f, rgb_decomp_obj_Df, &dcmp, x, 4, 1000);
+
+    unsigned char workspace[bfgs_WORKSPACE(4)];
+    bool result =
+      bfgs(rgb_decomp_obj_f, rgb_decomp_obj_Df, &dcmp, x, 4, 1000, workspace);
 
     printf("x = (%g,%g,%g,%g)\n", x[0], x[1], x[2], x[3]);
 
@@ -213,36 +224,35 @@ test_rgb2rgbw()
         }
     }
     printf("probe: (%g,%g,%g)\n", probe.R, probe.G, probe.B);
-    free_rgb_decomp(&dcmp);
-    return result;
 
 #if 0
-	if (decompose_RGB(&dcmp))
-	{
-		printf("success:");
-		for (int i=0; i<dcmp.dim; ++i)
-			printf(" %g", dcmp.s[i]);
-		printf("\n");
+    if (decompose_RGB(&dcmp))
+    {
+        printf("success:");
+        for (int i = 0; i < dcmp.dim; ++i)
+            printf(" %g", dcmp.s[i]);
+        printf("\n");
 
-		RGB probe = {0.,0.,0.};
-		for (int i=0; i<3; ++i)
-		{
-			for (int j=0; j<dcmp.dim; ++j)
-			{
-				probe.vec[i] += dcmp.base[j].vec[i] * dcmp.s[j];
-			}
-		}
-		printf("probe: (%g,%g,%g)\n", probe.R, probe.G, probe.B);
-	}
-	free_rgb_decomp(&dcmp);
-
+        RGB probe = { 0., 0., 0. };
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < dcmp.dim; ++j)
+            {
+                probe.vec[i] += dcmp.base[j].vec[i] * dcmp.s[j];
+            }
+        }
+        printf("probe: (%g,%g,%g)\n", probe.R, probe.G, probe.B);
+    }
+#    if 0
 	for (double K=2500.; K<8000.; K+=500.)
 	{
 		RGB bbr = KtoRGB(K,0.75);
 		printf("%.0f K => (%.0f,%.0f,%.0f)\n", K, bbr.R*255., bbr.G*255., bbr.B*255.);
 	}
-	return 0;
+#    endif
 #endif
+    free_rgb_decomp(&dcmp);
+    return result;
 }
 
 // vim: fenc=utf-8 noet:
