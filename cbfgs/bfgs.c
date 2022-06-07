@@ -68,15 +68,20 @@ static void LDLt_solve(
 	}
 }
 
-static inline double dot_v(const double * a, const double* b, int n)
+static inline double dot_v(
+	const double* a,
+	const double* b,
+	const unsigned int n)
 {
 	double d = 0.;
-	for (int k=0; k<n; ++k)
+	for (unsigned int k=0; k<n; ++k)
 		d += a[k]*b[k];
 	return d;
 }
 
-static inline double norm_v(const double* v, int n)
+static inline double norm_v(
+	const double* v,
+	const unsigned int n)
 {
 	return sqrt(dot_v(v,v,n));
 }
@@ -87,13 +92,13 @@ static inline double phi(
 	void* user_ptr,
 	const double* xk,
 	const double* pk,
-	double alpha,
-	int n,
+	const double alpha,
+	const unsigned int n,
 	double* work
 	)
 {
 	double* x = work;
-	for (int i=0; i<n; ++i)
+	for (unsigned int i=0; i<n; ++i)
 		x[i] = xk[i] + pk[i]*alpha;
 	return f(x, user_ptr);
 }
@@ -105,13 +110,13 @@ static inline double dphi(
 	const double* xk,
 	const double* pk,
 	double alpha,
-	int n,
+	unsigned int n,
 	double* work
 	)
 {
 	double* x = work;
 	double* Dfx = work + n;
-	for (int i=0; i<n; ++i)
+	for (unsigned int i=0; i<n; ++i)
 		x[i] = xk[i] + pk[i]*alpha;
 	Df(x, Dfx, user_ptr);
 	return dot_v(Dfx, pk, n);
@@ -124,7 +129,7 @@ static double zoom(
 	void* user_ptr,
 	const double* xk,
 	const double* pk,
-	int n,
+	const unsigned int n,
 	const double c1,
 	const double c2,
 	double phi_0,
@@ -168,7 +173,7 @@ static double linesearch(
 	void* user_ptr,
 	const double* xk,
 	const double* pk,
-	const int n,
+	const unsigned int n,
 	double* work
 	)
 {
@@ -181,11 +186,10 @@ static double linesearch(
 	double phi_0 = phi(f,user_ptr,xk,pk,0.,n,work);
 	double dphi_0 = dphi(Df,user_ptr,xk,pk,0.,n,work);
 	double phi_alpha_prev;
-	double alpha_star;
+	double alpha_star = 0.;
 	double dphi_alpha;
 
-	int iter;
-	for (iter=0; iter<1000; ++iter)
+	for (unsigned int iter=0; iter<1000; ++iter)
 	{
 		double phi_alpha = phi(f,user_ptr,xk,pk,alpha,n,work);
 		if (phi_alpha > phi_0 + c1*alpha*dphi_0
@@ -222,12 +226,12 @@ bool bfgs(
 	void(*Df)(const double*, double*, void*),
 	void* user_ptr,
 	double* x,
-	const int n,
-	const int max_iter
+	const unsigned int n,
+	const unsigned int max_iter
 	)
 {
 	static const double eps = 2.2204e-16;
-	const int ld = (n*(n+1))/2;
+	const unsigned int ld = (n*(n+1))/2;
 	double* B = (double*)malloc(ld*sizeof(double));
 	double* LD = (double*)malloc(ld*sizeof(double));
 
@@ -239,7 +243,7 @@ bool bfgs(
 	double* Bs = work; // n values
 	double* p = (double*)malloc(n*sizeof(double));
 	double alpha;
-	int iter;
+	unsigned int iter;
 	double step_length;
 
 	for (iter=0; iter<max_iter; ++iter)
@@ -247,7 +251,7 @@ bool bfgs(
 		Df(x,Dfx,user_ptr);
 		if (iter > 0)
 		{
-			for (int j=0; j<n; ++j)
+			for (unsigned int j=0; j<n; ++j)
 			{
 				s[j] += x[j];
 				y[j] += Dfx[j];
@@ -257,9 +261,9 @@ bool bfgs(
 			if (iter == 1)
 			{
 				double d = ys/dot_v(y,y,n);
-				for (int i=0; i<n; ++i)
+				for (unsigned int i=0; i<n; ++i)
 				{
-					for (int j=0; j<i; ++j)
+					for (unsigned int j=0; j<i; ++j)
 						B[Lx(i,j)] = 0.;
 					B[Lx(i,i)] = d;
 				}
@@ -267,20 +271,20 @@ bool bfgs(
 
 			/* B = B - ((B.s).(s'.B))/(s'.B.s) + (y.y')/(y'.s) */
 			double sBs = 0.;
-			for (int i=0; i<n; ++i)
+			for (unsigned int i=0; i<n; ++i)
 			{
 				Bs[i] = 0.;
-				for (int j=0; j<=i; ++j)
+				for (unsigned int j=0; j<=i; ++j)
 					Bs[i] += B[Lx(i,j)]*s[j];
-				for (int j=i+1; j<n; ++j)
+				for (unsigned int j=i+1; j<n; ++j)
 					Bs[i] += B[Lx(j,i)]*s[j];
 
 				sBs += s[i]*Bs[i];
 			}
 			double r_sBs = 1. / sBs;
 			double r_ys = 1. / ys;
-			for (int i=0; i<n; ++i)
-				for (int j=0; j<=i; ++j)
+			for (unsigned int i=0; i<n; ++i)
+				for (unsigned int j=0; j<=i; ++j)
 					B[Lx(i,j)] -= Bs[i]*Bs[j]*r_sBs - y[i]*y[j]*r_ys;
 		}
 
@@ -291,16 +295,16 @@ bool bfgs(
 			break;
 		}
 
-		for (int i=0; i<n; ++i)
+		for (unsigned int i=0; i<n; ++i)
 			p[i] = Dfx[i];
 		if (iter > 0)
 		{
 			memcpy(LD, B, ld*sizeof(double));
-			if (LDLt_factor(LD,n,work))
-				LDLt_solve(LD, n, p, work);
+			if (LDLt_factor(LD, (int)n, work))
+				LDLt_solve(LD, (int)n, p, work);
 			/* else: singular Hessian approx.; trying gradient descent */
 		}
-		for (int i=0; i<n; ++i)
+		for (unsigned int i=0; i<n; ++i)
 			p[i] = -p[i];
 
 		alpha = linesearch(f,Df,user_ptr,x,p,n,work);
@@ -314,7 +318,7 @@ bool bfgs(
 		//printf("%3i: obj. function: %g, step length: %g\n",
 		//	iter, f(x,user_ptr), step_length);
 
-		for (int i=0; i<n; ++i)
+		for (unsigned int i=0; i<n; ++i)
 		{
 			s[i] = -x[i];
 			y[i] = -Dfx[i];
@@ -329,7 +333,7 @@ bool bfgs(
 		result = false;
 	}
 	bool pd = true;
-	for (int i=0; i<n; ++i)
+	for (unsigned int i=0; i<n; ++i)
 		if (LD[Lx(i,i)] <= 0.) { pd = false; break; }
 
 	if (result && iter > 0 && !pd)

@@ -198,6 +198,7 @@ bool test_rgb2rgbw()
 		}
 	}
 	printf("probe: (%g,%g,%g)\n", probe.R, probe.G, probe.B);
+	free_rgb_decomp(&dcmp);
 	return result;
 
 #if 0
