@@ -21,13 +21,13 @@
  *
  * @author Michael Weitzel <mich@elweitzel.de>
  */
-bool bfgs(
-	double(*f)(const double*, void*),
-	void(*Df)(const double*, double*, void*),
-	void* user_ptr,
-	double* x,
-	const int n,
-	const int max_iter
-	);
+bool
+bfgs(
+  double (*f)(const double*, void*),
+  void (*Df)(const double*, double*, void*),
+  void* user_ptr,
+  double* x,
+  const int n,
+  const int max_iter);
 
 // vim: fenc=utf-8 noet:

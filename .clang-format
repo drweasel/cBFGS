@@ -1,0 +1,37 @@
+﻿---
+BasedOnStyle: Mozilla
+IndentWidth: 4
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: DontAlign
+AlignTrailingComments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Allman
+BreakConstructorInitializers: BeforeComma
+BreakStringLiterals: 'true'
+ColumnLimit: '80'
+CompactNamespaces: 'false'
+DerivePointerAlignment: 'true'
+FixNamespaceComments: 'true'
+AccessModifierOffset: -4
+IndentCaseLabels: 'false'
+IndentPPDirectives: AfterHash
+IndentWrappedFunctionNames: 'false'
+NamespaceIndentation: None
+PointerAlignment: Left
+ReflowComments: 'true'
+SortIncludes: 'true'
+SpaceAfterCStyleCast: 'false'
+SpaceAfterLogicalNot: 'false'
+SpaceAfterTemplateKeyword: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeCpp11BracedList: 'false'
+SpaceBeforeInheritanceColon: 'true'
+SpaceBeforeRangeBasedForLoopColon: 'true'
+SpaceInEmptyParentheses: 'false'
+SpacesInAngles: 'true'
+SpacesInCStyleCastParentheses: 'false'
+SpacesInSquareBrackets: 'false'
+BraceWrapping:
+  AfterControlStatement: MultiLine
+
+...

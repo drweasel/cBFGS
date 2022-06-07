@@ -6,18 +6,19 @@
  */
 #include "cbfgs/bfgs.h"
 #include "rosenbrock.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-bool test_rosenbrock()
+bool
+test_rosenbrock()
 {
-	double x[2] = { -14., 10. };
-	bool result = bfgs(rosenbrock_f, rosenbrock_Df, NULL, x, 2, 1000);
-	printf("result=%s; x = [ %g, %g ]\n",
-		result ? "true":"false", x[0], x[1]);
+    double x[2] = { -14., 10. };
+    bool result = bfgs(rosenbrock_f, rosenbrock_Df, NULL, x, 2, 1000);
+    printf(
+      "result=%s; x = [ %g, %g ]\n", result ? "true" : "false", x[0], x[1]);
 
-	return result;
+    return result;
 }
 
 // vim: fenc=utf-8 noet:

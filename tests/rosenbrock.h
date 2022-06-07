@@ -6,7 +6,10 @@
  * see the file LICENSE for details.
  */
 
-double rosenbrock_f(const double* x, void*);
-void rosenbrock_Df(const double* x, double* Df, void*);
+double
+rosenbrock_f(const double* x, void*);
+
+void
+rosenbrock_Df(const double* x, double* Df, void*);
 
 // vim: fenc=utf-8 noet:
