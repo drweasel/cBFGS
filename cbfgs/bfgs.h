@@ -9,7 +9,28 @@
 #include <stdbool.h>
 
 /** Computes the size of the required workspace, in bytes. */
-#define bfgs_WORKSPACE(n) (((n) * ((n) + 1) + 6 * (n)) * sizeof(double))
+#define bfgs_WORKSPACE_SIZE(n) (((n) * ((n) + 1) + 6 * (n)) * sizeof(double))
+
+typedef struct
+{
+    enum BFGS_State
+    {
+		bfgs_invalid_arguments = -3,
+        bfgs_max_iter_exceeded = -2,
+        bfgs_not_a_minimum = -1,
+        bfgs_unknown = 0,
+        bfgs_success_small_gradient = 1,
+        bfgs_success_small_step = 2
+    } state;
+    unsigned int niters;
+    double step_length;
+} BFGS_Result;
+
+/**
+ * Tests the previous optimisation run for success.
+ */
+bool
+is_bfgs_success(const BFGS_Result* result);
 
 /**
  * Quasi-Newton optimizer implementing the BFGS algorithm for
@@ -23,7 +44,7 @@
  * @param max_iter maximum number of iterations
  * @param workspace pre-allocated memory (see bfgs_WORKSPACE)
  */
-bool
+BFGS_Result
 bfgs(
   double (*f)(const double*, void*),
   void (*Df)(const double*, double*, void*),
@@ -33,4 +54,4 @@ bfgs(
   const unsigned int max_iter,
   void* workspace);
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:

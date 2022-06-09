@@ -6,10 +6,16 @@
  * see the file LICENSE for details.
  */
 
+typedef struct
+{
+    double a;
+    double b;
+} Rosenbrock;
+
 double
 rosenbrock_f(const double* x, void*);
 
 void
 rosenbrock_Df(const double* x, double* Df, void*);
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:

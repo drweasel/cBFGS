@@ -39,4 +39,4 @@ main()
     return result;
 }
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:

@@ -4,6 +4,7 @@
  * This file is licensed under the terms of the standard MIT License;
  * see the file LICENSE for details.
  */
+#include "bfgs.h"
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
@@ -237,6 +238,13 @@ linesearch(
 }
 
 bool
+is_bfgs_success(const BFGS_Result* result)
+{
+    return result->state == bfgs_success_small_step ||
+           result->state == bfgs_success_small_gradient;
+}
+
+BFGS_Result
 bfgs(
   double (*f)(const double*, void*),
   void (*Df)(const double*, double*, void*),
@@ -260,7 +268,16 @@ bfgs(
     double* p = work + 2 * n;
     double alpha;
     unsigned int iter;
-    double step_length;
+    double step_length = 0.;
+
+    BFGS_Result result;
+    result.state = bfgs_unknown;
+
+    if (!f || !Df || !x || !n || !max_iter || !workspace)
+    {
+        result.state = bfgs_invalid_arguments;
+        return result;
+    }
 
     for (iter = 0; iter < max_iter; ++iter)
     {
@@ -308,11 +325,13 @@ bfgs(
         {
             // printf("%3i: small gradient: |Dfx|=%g\n",
             //	iter, norm_v(Dfx,n));
+            result.state = bfgs_success_small_gradient;
             break;
         }
 
         for (unsigned int i = 0; i < n; ++i)
             p[i] = Dfx[i];
+
         if (iter > 0)
         {
             memcpy(LD, B, ld * sizeof(double));
@@ -329,6 +348,7 @@ bfgs(
         {
             // printf("%3i: detected a small step (%g); aborting\n",
             //	iter, step_length);
+            result.state = bfgs_success_small_step;
             break;
         }
         // printf("%3i: obj. function: %g, step length: %g\n",
@@ -342,27 +362,32 @@ bfgs(
         }
     }
 
-    bool result = true;
+    result.niters = iter;
+    result.step_length = step_length;
+
     if (iter == max_iter)
     {
         /* max_iter exceeded */
-        result = false;
+        result.state = bfgs_max_iter_exceeded;
+        return result;
     }
+
     bool pd = true;
     for (unsigned int i = 0; i < n; ++i)
+    {
         if (LD[Lx(i, i)] <= 0.)
         {
             pd = false;
             break;
         }
-
-    if (result && iter > 0 && !pd)
+    }
+    if (iter > 0 && !pd)
     {
         /* Hessian not positive definite; probably not a proper minimum */
-        result = false;
+        result.state = bfgs_not_a_minimum;
     }
 
     return result;
 }
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:

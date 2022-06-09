@@ -167,14 +167,14 @@ rgb_decomp_obj_Df(const double* s, double* Df, void* uptr)
 bool
 decompose_RGB(RGB_Decomp* dcmp)
 {
-    bool result;
+    BFGS_Result result;
     if (dcmp == NULL || dcmp->dim <= 0)
         return false;
 
     for (int k = 0; k < dcmp->dim; ++k)
         dcmp->s[k] = 0.5;
 
-    void* workspace = malloc(bfgs_WORKSPACE(dcmp->dim));
+    void* workspace = malloc(bfgs_WORKSPACE_SIZE(dcmp->dim));
     result = bfgs(
       rgb_decomp_obj_f,
       rgb_decomp_obj_Df,
@@ -193,7 +193,7 @@ decompose_RGB(RGB_Decomp* dcmp)
             dcmp->s[k] = 1.;
     }
 
-    return result;
+    return is_bfgs_success(&result);
 }
 
 bool
@@ -209,8 +209,8 @@ test_rgb2rgbw()
 
     double x[4] = { 0.5, 0.5, 0.5, 0.5 };
 
-    unsigned char workspace[bfgs_WORKSPACE(4)];
-    bool result =
+    unsigned char workspace[bfgs_WORKSPACE_SIZE(4)];
+    BFGS_Result result =
       bfgs(rgb_decomp_obj_f, rgb_decomp_obj_Df, &dcmp, x, 4, 1000, workspace);
 
     printf("x = (%g,%g,%g,%g)\n", x[0], x[1], x[2], x[3]);
@@ -252,7 +252,7 @@ test_rgb2rgbw()
 #    endif
 #endif
     free_rgb_decomp(&dcmp);
-    return result;
+    return is_bfgs_success(&result);
 }
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:

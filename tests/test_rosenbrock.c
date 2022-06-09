@@ -13,14 +13,23 @@
 bool
 test_rosenbrock()
 {
-	unsigned char workspace[bfgs_WORKSPACE(2)];
-    double x[2] = { -14., 10. };
-    bool result =
-      bfgs(rosenbrock_f, rosenbrock_Df, NULL, x, 2, 1000, workspace);
-    printf(
-      "result=%s; x = [ %g, %g ]\n", result ? "true" : "false", x[0], x[1]);
+    unsigned char workspace[bfgs_WORKSPACE_SIZE(2)];
 
-    return result;
+    double x[2] = { -3., -4. };
+    Rosenbrock rb_param = { 1., 100. };
+
+    BFGS_Result result =
+      bfgs(rosenbrock_f, rosenbrock_Df, &rb_param, x, 2, 100, workspace);
+
+    printf(
+      "result=%s; #iters=%i; step_length=%g, x = [ %g, %g ]\n",
+      is_bfgs_success(&result) ? "true" : "false",
+      result.niters,
+	  result.step_length,
+      x[0],
+      x[1]);
+
+    return is_bfgs_success(&result);
 }
 
-// vim: fenc=utf-8 noet:
+// vim: fenc=utf-8 et:
