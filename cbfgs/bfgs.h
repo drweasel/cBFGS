@@ -15,7 +15,7 @@ typedef struct
 {
     enum BFGS_State
     {
-		bfgs_invalid_arguments = -3,
+        bfgs_invalid_arguments = -3,
         bfgs_max_iter_exceeded = -2,
         bfgs_not_a_minimum = -1,
         bfgs_unknown = 0,
