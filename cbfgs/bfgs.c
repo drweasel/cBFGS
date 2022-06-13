@@ -10,6 +10,7 @@
 #include <string.h>
 
 #define Lx(i, j) ((((i) * ((i) + 1)) >> 1) + (j))
+#define MACHEPS 2.2204e-16
 
 /* work: n values */
 static bool
@@ -132,7 +133,7 @@ zoom(
     double alpha, phi_alpha;
     for (;;)
     {
-        if (alpha_lo + 10 * 2.22e-16 >= alpha_hi)
+        if (alpha_lo + 10. * MACHEPS >= alpha_hi)
             return alpha_lo;
 
         // printf("...zoom(%g,%g)\n", alpha_lo, alpha_hi);
@@ -168,11 +169,11 @@ linesearch(
   const unsigned int n,
   double* work)
 {
+    static const double c1 = 1e-4;
+    static const double c2 = 0.9;
+
     double alpha_prev = 0.;
     double alpha = 1.;
-
-    double c1 = 1e-4;
-    double c2 = 0.9;
 
     double phi_0 = phi(f, user_ptr, xk, pk, 0., n, work);
     double dphi_0 = dphi(Df, user_ptr, xk, pk, 0., n, work);
@@ -254,7 +255,6 @@ bfgs(
   const unsigned int max_iter,
   void* workspace)
 {
-    static const double eps = 2.2204e-16;
     const unsigned int ld = (n * (n + 1)) / 2;
     double* B = (double*)workspace;
     double* LD = B + ld;
@@ -321,7 +321,7 @@ bfgs(
                     B[Lx(i, j)] -= Bs[i] * Bs[j] * r_sBs - y[i] * y[j] * r_ys;
         }
 
-        if (norm_v(Dfx, n) < 100 * eps)
+        if (norm_v(Dfx, n) < 100. * MACHEPS)
         {
             // printf("%3i: small gradient: |Dfx|=%g\n",
             //	iter, norm_v(Dfx,n));
@@ -344,7 +344,7 @@ bfgs(
 
         alpha = linesearch(f, Df, user_ptr, x, p, n, work);
         step_length = alpha * norm_v(p, n);
-        if (step_length < 10. * eps)
+        if (step_length < 10. * MACHEPS)
         {
             // printf("%3i: detected a small step (%g); aborting\n",
             //	iter, step_length);
