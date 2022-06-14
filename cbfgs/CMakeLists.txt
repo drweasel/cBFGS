@@ -2,6 +2,7 @@ add_library(cbfgs)
 
 set(cbfgs_src
   bfgs.c bfgs.h
+  finite_diff.c finite_diff.h
   )
 target_sources(cbfgs PRIVATE ${cbfgs_src})
 target_compile_options(cbfgs PRIVATE
