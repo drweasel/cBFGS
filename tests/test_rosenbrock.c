@@ -5,6 +5,7 @@
  * see the file LICENSE for details.
  */
 #include "cbfgs/bfgs.h"
+#include "cbfgs/finite_diff.h"
 #include "rosenbrock.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,8 +19,14 @@ test_rosenbrock()
     double x[2] = { -3., -4. };
     Rosenbrock rb_param = { 1., 100. };
 
+#if 0
     BFGS_Result result =
       bfgs(rosenbrock_f, rosenbrock_Df, &rb_param, x, 2, 100, workspace);
+#else
+    FDWrapper fdw = make_fd_wrapper(rosenbrock_f, &rb_param, 2);
+    BFGS_Result result =
+      bfgs(fdw.f, fdw.Df, &fdw, x, 2, 100, workspace);
+#endif
 
     printf(
       "result=%s; #iters=%i; step_length=%g, x = [ %g, %g ]\n",
