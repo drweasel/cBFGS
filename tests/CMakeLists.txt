@@ -9,4 +9,15 @@ target_sources(bfgs_test PRIVATE
   )
 target_link_libraries(bfgs_test PUBLIC cbfgs)
 
+target_compile_options(bfgs_test PRIVATE
+  -Wall
+  -Wextra
+  -Wshadow
+  -Wunused
+  -Wconversion
+  -Wsign-conversion
+  -Wformat=2
+  -pedantic
+  )
+
 # vim:fenc=utf-8 et sw=2:
