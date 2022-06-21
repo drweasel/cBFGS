@@ -4,6 +4,7 @@
  * This file is licensed under the terms of the standard MIT License;
  * see the file LICENSE for details.
  */
+
 #include "bfgs.h"
 #include "finite_diff.h"
 #include <math.h>

@@ -1,4 +1,10 @@
 #pragma once
+/*
+ * Copyright (c) 2022 Michael Weitzel <mich@elweitzel.de>
+ *
+ * This file is licensed under the terms of the standard MIT License;
+ * see the file LICENSE for details.
+ */
 
 typedef struct
 {

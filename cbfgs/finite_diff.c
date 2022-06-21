@@ -1,8 +1,16 @@
+/*
+ * Copyright (c) 2022 Michael Weitzel <mich@elweitzel.de>
+ *
+ * This file is licensed under the terms of the standard MIT License;
+ * see the file LICENSE for details.
+ */
+
 #include "finite_diff.h"
 #include "stdlib.h"
 
 #define MACHEPS 2.2204e-16
 
+#if 0
 // Halley iteration for approximating the function a^(1/order)
 // up to machine precision. This can be evaluated
 static inline double
@@ -24,6 +32,7 @@ orderth_root(const unsigned int _order, const double a)
         xj = xj_n;
     }
 }
+#endif
 
 static double
 finite_diff(
@@ -35,10 +44,23 @@ finite_diff(
     const unsigned int L = 1;
     const unsigned int R = 1;
     const unsigned int order = L + R;
+#if 0
     const double h = (order == 1) ? 3.4526698e-4 : orderth_root(order, MACHEPS);
+#endif
+    static const double all_h[] = { 0.,
+                                    0.00034526698,
+                                    1.490116119384766e-08,
+                                    6.055454452393343e-06,
+                                    0.0001220703125,
+                                    0.0007400959797414051,
+                                    0.002460783300575925,
+                                    0.005804665191941207,
+                                    0.01104854345603981,
+                                    0.01822701624337682,
+                                    0.02720470510300388 };
+    const double h = all_h[order];
 
-
-    const double all_coeffs[][6][11] = {
+    static const double all_coeffs[][6][11] = {
         // clang-format off
 		{ // L = 0
 			{ 0 }, // R = 0
@@ -131,14 +153,14 @@ fd_gradient(
 static double
 fdwrapper_f_(const double* x, void* user_ptr)
 {
-    FDWrapper* fdw = (FDWrapper*)user_ptr;
+    FDWrapper* fdw = user_ptr;
     return fdw->orig_f(x, fdw->user_ptr);
 }
 
 static void
 fdwrapper_Df_(const double* x, double* df, void* user_ptr)
 {
-    FDWrapper* fdw = (FDWrapper*)user_ptr;
+    FDWrapper* fdw = user_ptr;
     fd_gradient(fdw->orig_f, fdw->user_ptr, (double*)x /* ouch! */, df, fdw->n);
 }
 
