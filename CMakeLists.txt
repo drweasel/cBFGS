@@ -7,6 +7,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+#set(CMAKE_C_CLANG_TIDY clang-tidy;
+#  -checks=*
+#  )
+
+add_compile_options(-fdiagnostics-color=always)
+
 set(CMAKE_BUILD_TYPE Release) # Debug
 
 option(BUILD_SHARED_LIBS "build shared libraries" OFF)

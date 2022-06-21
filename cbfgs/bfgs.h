@@ -9,7 +9,8 @@
 #include <stdbool.h>
 
 /** Computes the size of the required workspace, in bytes. */
-#define bfgs_WORKSPACE_SIZE(n) (((n) * ((n) + 1) + 6 * (n)) * sizeof(double))
+#define bfgs_WORKSPACE_SIZE(n) \
+    (((unsigned)(n) * ((unsigned)(n) + 1) + 6 * (unsigned)(n)) * sizeof(double))
 
 typedef struct
 {
@@ -48,6 +49,21 @@ BFGS_Result
 bfgs(
   double (*f)(const double*, void*),
   void (*Df)(const double*, double*, void*),
+  void* user_ptr,
+  double* x,
+  const unsigned int n,
+  const unsigned int max_iter,
+  void* workspace);
+
+/**
+ * Convenience wrapper for bfgs which computes derivated based on the finite
+ * difference method.
+ *
+ * @see bfgs
+ */
+BFGS_Result
+bfgs_fd(
+  double (*f)(const double*, void*),
   void* user_ptr,
   double* x,
   const unsigned int n,

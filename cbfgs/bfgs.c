@@ -5,11 +5,12 @@
  * see the file LICENSE for details.
  */
 #include "bfgs.h"
+#include "finite_diff.h"
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
 
-#define Lx(i, j) ((((i) * ((i) + 1)) >> 1) + (j))
+#define Lx(i, j) ((((unsigned)(i) * ((unsigned)(i) + 1u)) >> 1u) + (unsigned)(j))
 #define MACHEPS 2.2204e-16
 
 /* work: n values */
@@ -21,18 +22,26 @@ LDLt_factor(double* A, const int n, double* work)
     for (int j = 0; j < n; ++j)
     {
         for (int i = 0; i < j; ++i)
+        {
             v[i] = A[Lx(j, i)] * A[Lx(i, i)];
+        }
         v[j] = A[Lx(j, j)];
         for (int k = 0; k < j; ++k)
+        {
             v[j] -= A[Lx(j, k)] * v[k];
+        }
         if (v[j] <= 0.)
+        {
             result = false;
+        }
         A[Lx(j, j)] = v[j];
         for (int i = j + 1; i < n; ++i)
         {
             double s = A[Lx(i, j)];
             for (int k = 0; k < j; ++k)
+            {
                 s -= A[Lx(i, k)] * v[k];
+            }
             A[Lx(i, j)] = s / v[j];
         }
     }
@@ -49,7 +58,9 @@ LDLt_solve(const double* LD, const int n, double* b, double* work)
     {
         double s = b[i];
         for (int j = 0; j < i; ++j)
+        {
             s -= LD[Lx(i, j)] * zy[j];
+        }
         zy[i] = s;
     }
     /* backward; solve D.y = z, L^t.x = y */
@@ -57,7 +68,9 @@ LDLt_solve(const double* LD, const int n, double* b, double* work)
     {
         double s = zy[i] / LD[Lx(i, i)];
         for (int k = i + 1; k < n; ++k)
+        {
             s -= LD[Lx(k, i)] * b[k];
+        }
         b[i] = s;
     }
 }
@@ -67,7 +80,9 @@ dot_v(const double* a, const double* b, const unsigned int n)
 {
     double d = 0.;
     for (unsigned int k = 0; k < n; ++k)
+    {
         d += a[k] * b[k];
+    }
     return d;
 }
 
@@ -90,7 +105,9 @@ phi(
 {
     double* x = work;
     for (unsigned int i = 0; i < n; ++i)
+    {
         x[i] = xk[i] + pk[i] * alpha;
+    }
     return f(x, user_ptr);
 }
 
@@ -108,7 +125,9 @@ dphi(
     double* x = work;
     double* Dfx = work + n;
     for (unsigned int i = 0; i < n; ++i)
+    {
         x[i] = xk[i] + pk[i] * alpha;
+    }
     Df(x, Dfx, user_ptr);
     return dot_v(Dfx, pk, n);
 }
@@ -134,7 +153,9 @@ zoom(
     for (;;)
     {
         if (alpha_lo + 10. * MACHEPS >= alpha_hi)
+        {
             return alpha_lo;
+        }
 
         // printf("...zoom(%g,%g)\n", alpha_lo, alpha_hi);
 
@@ -150,9 +171,13 @@ zoom(
         {
             double dphi_alpha = dphi(Df, user_ptr, xk, pk, alpha, n, work);
             if (fabs(dphi_alpha) <= -c2 * dphi_0)
+            {
                 return alpha;
+            }
             if (dphi_alpha * (alpha_hi - alpha_lo) >= 0.)
+            {
                 alpha_hi = alpha_lo;
+            }
             alpha_lo = alpha;
         }
     }
@@ -265,7 +290,7 @@ bfgs(
 
     double* work = y + n;
     double* Bs = work;
-    double* p = work + 2 * n;
+    double* p = work + 2UL * n;
     double alpha;
     unsigned int iter;
     double step_length = 0.;
@@ -297,7 +322,9 @@ bfgs(
                 for (unsigned int i = 0; i < n; ++i)
                 {
                     for (unsigned int j = 0; j < i; ++j)
+                    {
                         B[Lx(i, j)] = 0.;
+                    }
                     B[Lx(i, i)] = d;
                 }
             }
@@ -308,17 +335,24 @@ bfgs(
             {
                 Bs[i] = 0.;
                 for (unsigned int j = 0; j <= i; ++j)
+                {
                     Bs[i] += B[Lx(i, j)] * s[j];
+                }
                 for (unsigned int j = i + 1; j < n; ++j)
+                {
                     Bs[i] += B[Lx(j, i)] * s[j];
-
+                }
                 sBs += s[i] * Bs[i];
             }
             double r_sBs = 1. / sBs;
             double r_ys = 1. / ys;
             for (unsigned int i = 0; i < n; ++i)
+            {
                 for (unsigned int j = 0; j <= i; ++j)
+                {
                     B[Lx(i, j)] -= Bs[i] * Bs[j] * r_sBs - y[i] * y[j] * r_ys;
+                }
+            }
         }
 
         if (norm_v(Dfx, n) < 100. * MACHEPS)
@@ -330,14 +364,18 @@ bfgs(
         }
 
         for (unsigned int i = 0; i < n; ++i)
+        {
             p[i] = Dfx[i];
+        }
 
         if (iter > 0)
         {
             memcpy(LD, B, ld * sizeof(double));
             if (LDLt_factor(LD, (int)n, work))
+            {
                 LDLt_solve(LD, (int)n, p, work);
-            /* else: singular Hessian approx.; trying gradient descent */
+            }
+            // else: singular Hessian approx.; trying gradient descent
         }
         for (unsigned int i = 0; i < n; ++i)
             p[i] = -p[i];
@@ -388,6 +426,19 @@ bfgs(
     }
 
     return result;
+}
+
+BFGS_Result
+bfgs_fd(
+  double (*f)(const double*, void*),
+  void* user_ptr,
+  double* x,
+  const unsigned int n,
+  const unsigned int max_iter,
+  void* workspace)
+{
+    FDWrapper fdw = make_fd_wrapper(f, user_ptr, n);
+    return bfgs(fdw.f, fdw.Df, &fdw, x, n, max_iter, workspace);
 }
 
 // vim: fenc=utf-8 et:

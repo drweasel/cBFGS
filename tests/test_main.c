@@ -25,7 +25,9 @@ main()
         printf("=== FAILED!\n");
     }
     else
+    {
         printf("=== ok.\n");
+    }
 
     printf("\n=== RGB2RGBW conversion ...\n");
     if (!test_rgb2rgbw())
@@ -34,7 +36,9 @@ main()
         printf("=== FAILED!\n");
     }
     else
+    {
         printf("=== ok.\n");
+    }
 
     return result;
 }
