@@ -49,7 +49,6 @@ XYZtoRGB(XYZ xyz)
     rgb.G = -0.969256 * x + 1.875992 * y + 0.041556 * z;
     rgb.B = 0.055648 * x - 0.204043 * y + 1.057311 * z;
 
-#pragma unroll
     for (int i = 0; i < 3; ++i)
     {
         if (rgb.vec[i] < 0.)
@@ -124,7 +123,6 @@ RGB_Decomp
 new_rgb_decomp(RGB obj_rgb, RGB* base, int dim)
 {
     RGB_Decomp dcmp;
-#pragma unroll
     for (int k = 0; k < 3; ++k)
     {
         dcmp.obj_rgb.vec[k] = obj_rgb.vec[k];
