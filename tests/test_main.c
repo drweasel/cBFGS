@@ -6,22 +6,23 @@
  */
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 bool
-test_rosenbrock();
+test_rosenbrock(void);
 
 bool
-test_rgb2rgbw();
+test_rgb2rgbw(void);
 
 int
-main()
+main(void)
 {
-    int result = 0;
+    int result = EXIT_SUCCESS;
 
     printf("\n=== Rosenbrock function ...\n");
     if (!test_rosenbrock())
     {
-        result = 1;
+        result = EXIT_FAILURE;
         printf("=== FAILED!\n");
     }
     else
@@ -32,7 +33,7 @@ main()
     printf("\n=== RGB2RGBW conversion ...\n");
     if (!test_rgb2rgbw())
     {
-        result = 1;
+        result = EXIT_FAILURE;
         printf("=== FAILED!\n");
     }
     else

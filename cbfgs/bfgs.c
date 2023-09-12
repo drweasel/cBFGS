@@ -11,7 +11,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define Lx(i, j) ((((unsigned)(i) * ((unsigned)(i) + 1u)) >> 1u) + (unsigned)(j))
+#define Lx(i, j) \
+    ((((unsigned)(i) * ((unsigned)(i) + 1u)) >> 1u) + (unsigned)(j))
 #define MACHEPS 2.2204e-16
 
 /* work: n values */
@@ -267,8 +268,8 @@ linesearch(
 bool
 is_bfgs_success(const BFGS_Result* result)
 {
-    return result->state == bfgs_success_small_step ||
-           result->state == bfgs_success_small_gradient;
+    return result && (result->state == bfgs_success_small_step ||
+                      result->state == bfgs_success_small_gradient);
 }
 
 BFGS_Result

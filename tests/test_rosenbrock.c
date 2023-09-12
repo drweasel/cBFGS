@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 bool
-test_rosenbrock()
+test_rosenbrock(void)
 {
     unsigned char workspace[bfgs_WORKSPACE_SIZE(2)];
 

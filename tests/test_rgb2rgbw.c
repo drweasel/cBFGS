@@ -227,7 +227,7 @@ decompose_RGB(RGB_Decomp* dcmp)
 }
 
 bool
-test_rgb2rgbw()
+test_rgb2rgbw(void)
 {
     RGB base[] = { { { 0.9, 0.1, 0.05 } },
                    { { 0.0, 0.9, 0.1 } },

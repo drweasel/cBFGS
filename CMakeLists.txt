@@ -11,7 +11,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #  -checks=*
 #  )
 
-add_compile_options(-fdiagnostics-color=always)
+add_compile_options(-fdiagnostics-color=always -Wall -Werror)
 
 set(CMAKE_BUILD_TYPE Release) # Debug
 
